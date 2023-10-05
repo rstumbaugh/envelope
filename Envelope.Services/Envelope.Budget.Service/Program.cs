@@ -1,3 +1,6 @@
+using Envelope.Budget.Service.Auth;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Newtonsoft.Json.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -9,7 +12,34 @@ namespace Envelope.Budget.Service
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var corsOptions = "_openCors";
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(corsOptions, policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+            builder.Services
+                .AddAuthorization()
+                .AddAuthentication(GoogleAuthenticationHandlerOptions.Scheme)
+                .AddScheme<GoogleAuthenticationHandlerOptions, GoogleAuthenticationHandler>(
+                    GoogleAuthenticationHandlerOptions.Scheme, 
+                    options =>
+                    {
+
+                    });
+                
+
             // Add services to the container.
+            builder.Services.AddRouting(options =>
+            {
+                options.LowercaseUrls = true;
+            });
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
@@ -18,13 +48,11 @@ namespace Envelope.Budget.Service
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -33,8 +61,10 @@ namespace Envelope.Budget.Service
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors(corsOptions);
 
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
             app.Run();

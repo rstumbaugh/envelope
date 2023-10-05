@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Envelope.Budget.Service.Controllers
@@ -24,6 +26,14 @@ namespace Envelope.Budget.Service.Controllers
                 },
                 testEnum = Test.Value
             });
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult<string>> GetName([FromBody] string cred)
+        {
+            var user = HttpContext.User;
+            return Json(HttpContext.User.Identity.Name);
         }
     }
 }
