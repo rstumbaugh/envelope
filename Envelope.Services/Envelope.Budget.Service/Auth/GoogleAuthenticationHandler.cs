@@ -1,5 +1,6 @@
 ﻿using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -13,12 +14,18 @@ namespace Envelope.Budget.Service.Auth
 
     public class GoogleAuthenticationHandler : AuthenticationHandler<GoogleAuthenticationHandlerOptions>
     {
+        private readonly ILogger<GoogleAuthenticationHandler> _logger;
+        private readonly IUserProvider _userProvider;
+
         public GoogleAuthenticationHandler(
-            IOptionsMonitor<GoogleAuthenticationHandlerOptions> options, 
-            ILoggerFactory logger, 
-            UrlEncoder encoder, 
-            ISystemClock clock) : base(options, logger, encoder, clock)
+            IOptionsMonitor<GoogleAuthenticationHandlerOptions> options,
+            ILoggerFactory logger,
+            UrlEncoder encoder,
+            ISystemClock clock,
+            IUserProvider userProvider) : base(options, logger, encoder, clock)
         {
+            _logger = logger.CreateLogger<GoogleAuthenticationHandler>();
+            _userProvider = userProvider;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -34,19 +41,16 @@ namespace Envelope.Budget.Service.Auth
                 return AuthenticateResult.Fail("Empty bearer header");
             }
 
-            GoogleJsonWebSignature.Payload result;
-            try
+            var result = await _userProvider.FromGoogleCredentialAsync(token);
+            if (!result.Success)
             {
-                result = await GoogleJsonWebSignature.ValidateAsync(token);
-            } 
-            catch (Exception)
-            {
-                return AuthenticateResult.Fail("Nonexistent Google user");
+                return AuthenticateResult.Fail(result.Error);
             }
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, result.Name)
+                new Claim(ClaimTypes.Name, result.User.Name),
+                new Claim("Token", token)
             };
 
             var identity = new ClaimsIdentity(claims, Scheme.Name);

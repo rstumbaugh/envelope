@@ -1,4 +1,6 @@
 using Envelope.Budget.Service.Auth;
+using Envelope.Budget.Service.Hubs;
+using Envelope.Core.Repositories;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Newtonsoft.Json.Serialization;
 using System.Text.Json;
@@ -20,9 +22,17 @@ namespace Envelope.Budget.Service
                 {
                     policy.WithOrigins("http://localhost:5173")
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
+
+            builder.Services.AddSignalR()
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                    options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
             builder.Services
                 .AddAuthorization()
@@ -33,7 +43,6 @@ namespace Envelope.Budget.Service
                     {
 
                     });
-                
 
             // Add services to the container.
             builder.Services.AddRouting(options =>
@@ -51,6 +60,9 @@ namespace Envelope.Budget.Service
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddSingleton<IUserProvider, NullUserProvider>();
+            builder.Services.AddSingleton<IBudgetRepository, NullBudgetRepository>();
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -63,10 +75,14 @@ namespace Envelope.Budget.Service
 
             app.UseCors(corsOptions);
 
+            app.UseMiddleware<WebSocketAuthMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHub<BudgetHub>("/hubBudget");
+
             app.MapControllers();
+
             app.Run();
         }
     }
