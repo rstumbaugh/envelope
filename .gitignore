@@ -30,3 +30,4 @@ keys
 **/.vs
 **/bin
 **/obj
+Envelope.UI/src/config.json
