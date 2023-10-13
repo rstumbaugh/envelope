@@ -51,6 +51,7 @@ export default function BudgetNav() {
     <Menu
       mode="inline"
       defaultSelectedKeys={[selectedMenuItem]}
+      style={{ height: "100%" }}
       items={[
         {
           label: <Link to={`/budget/${budgetId}`}>{budget.name}</Link>,

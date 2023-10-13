@@ -8,7 +8,7 @@ import GoogleCredentialsProvider from "./util/GoogleCredentialsProvider.tsx";
 import config from "./config.json";
 import UserProvider from "./util/UserProvider.tsx";
 import Budget from "./pages/Budget.tsx";
-import Account from "./pages/Account.tsx";
+import Account from "./components/account/Account.tsx";
 import MonthlyBudget from "./components/budget/MonthlyBudget.tsx";
 
 export interface LoaderData {

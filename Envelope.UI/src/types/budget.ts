@@ -21,3 +21,14 @@ export const defaultBudget: Budget = {
   name: "",
   accounts: [],
 };
+
+export interface Transaction {
+  id: string;
+  accountId: string;
+  timestamp: Date;
+  payee: string;
+  categoryId: string;
+  note: string;
+  amount: number;
+  isCleared: boolean;
+}

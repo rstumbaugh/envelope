@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData } from "react-router-dom";
 import { Budget, defaultBudget } from "../types/budget";
 import { createContext, useEffect, useState } from "react";
-import { useBudgetConnection } from "../api/connections";
+import { useBudgetConnection } from "../api/connection/budgetConnection";
 import { Layout } from "antd";
 import Sider from "antd/es/layout/Sider";
 import _ from "lodash";
@@ -27,7 +27,7 @@ export default function BudgetPage() {
 
   return (
     <BudgetContext.Provider value={budget}>
-      <Layout>
+      <Layout style={{ height: "100%" }}>
         <Sider>
           <BudgetNav />
         </Sider>

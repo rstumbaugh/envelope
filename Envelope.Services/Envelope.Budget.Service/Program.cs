@@ -62,6 +62,7 @@ namespace Envelope.Budget.Service
 
             builder.Services.AddSingleton<IUserProvider, NullUserProvider>();
             builder.Services.AddSingleton<IBudgetRepository, NullBudgetRepository>();
+            builder.Services.AddSingleton<ITransactionRepository, NullTransactionRepository>();
 
             var app = builder.Build();
 
@@ -80,6 +81,7 @@ namespace Envelope.Budget.Service
             app.UseAuthorization();
 
             app.MapHub<BudgetHub>("/hubBudget");
+            app.MapHub<TransactionHub>("/hubTransaction");
 
             app.MapControllers();
 
