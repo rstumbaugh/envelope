@@ -1,17 +1,13 @@
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useEffect, useState } from "react";
 import { User } from "../types/user";
 import useApi from "../api/api";
 
 type UserContextType = { user: User | undefined };
 
-function reducer(_oldContext: UserContextType, newContext: UserContextType) {
-  return newContext;
-}
-
 export const UserContext = createContext<UserContextType>({ user: undefined });
 
 export default function UserProvider(props: { children: any }) {
-  const [user, dispatch] = useReducer(reducer, { user: undefined });
+  const [user, setUser] = useState<UserContextType>({ user: undefined });
 
   const api = useApi();
   useEffect(() => {
@@ -19,11 +15,11 @@ export default function UserProvider(props: { children: any }) {
       .getUser()
       .then((user) => {
         console.log("found user", user);
-        dispatch({ user });
+        setUser({ user });
       })
       .catch((err) => {
         console.error("error getting user", err);
-        dispatch({ user: undefined });
+        setUser({ user: undefined });
       });
   }, [api.user]);
 

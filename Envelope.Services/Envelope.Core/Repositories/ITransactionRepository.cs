@@ -27,7 +27,7 @@ namespace Envelope.Core.Repositories
         {
             await InitTransactions();
             return _transactions
-                .Where(_ => _.AccountId == searchRequest.AccountId)
+                .Where(_ => string.IsNullOrEmpty(searchRequest.AccountId) || _.AccountId == searchRequest.AccountId)
                 .ToArray();
         }
 

@@ -35,7 +35,7 @@ namespace Envelope.Budget.Service.Hubs
         public async Task UpdateTransaction(Transaction newTransaction)
         {
             var updated = await _transactionRepository.UpdateAsync(newTransaction);
-            await Clients.Caller.OnTransactions(new[] { updated });
+            await Clients.All.OnTransactions(new[] { updated });
         }
 
     }

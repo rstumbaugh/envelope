@@ -1,17 +1,19 @@
 import moment from "moment";
 import { Transaction } from "../../types/budget";
 import EditableTable from "../../util/EditableTable";
+import { useConnections } from "../../util/ConnectionProvider";
 
 interface Props {
   transactions: Transaction[];
 }
 
 export default function TransactionTable(props: Props) {
-  console.log(props.transactions);
+  const { transactionConnection } = useConnections();
+
   return (
     <EditableTable
       data={props.transactions}
-      onEdit={(t) => console.log(t)}
+      onEdit={(t) => transactionConnection?.editTransaction(t)}
       columns={[
         {
           title: "Date",

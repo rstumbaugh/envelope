@@ -1,5 +1,5 @@
-import { Dictionary } from "lodash";
-import { Connection, useConnection } from "../../api/connection/connections";
+import { Dictionary, random } from "lodash";
+import { Connection } from "../../api/connection/connections";
 import { Transaction } from "../../types/budget";
 import { HubConnection } from "@microsoft/signalR";
 
@@ -9,41 +9,37 @@ const Messages = {
 
 const Endpoints = {
   RequestTransactions: "RequestTransactions",
+  UpdateTransaction: "UpdateTransaction",
 };
 
 interface TransactionRequest {
-  accountId: string;
+  accountId?: string;
 }
 
-type TransactionsUpdatedHandler = () => void;
+type TransactionsUpdatedHandler = (transactions: Transaction[]) => void;
 
-class TransactionConnection extends Connection {
-  accountTransactions: Dictionary<Transaction[]>;
+export class TransactionConnection extends Connection {
   onUpdateCallbacks: TransactionsUpdatedHandler[];
+  id: number;
 
   constructor(connection: HubConnection) {
     super(connection);
 
-    this.accountTransactions = {};
     this.onUpdateCallbacks = [];
+    this.id = random(10000);
   }
 
   initHandlers(): void {
+    console.log("handlers for", this.id);
     this.connection.on(Messages.OnTransactions, (transactions: Transaction[]) => {
-      console.log("received transactions", transactions);
-      transactions.forEach((t) => {
-        if (!(t.accountId in this.accountTransactions)) this.accountTransactions[t.accountId] = [];
-
-        this.accountTransactions[t.accountId].push(t);
-      });
-
-      this.onUpdateCallbacks.forEach((c) => c());
+      this.onUpdateCallbacks.forEach((c) => c(transactions));
     });
   }
 
   onStart(): void {}
 
   registerCallback(c: TransactionsUpdatedHandler) {
+    console.log("registering callback");
     this.onUpdateCallbacks.push(c);
   }
 
@@ -52,8 +48,11 @@ class TransactionConnection extends Connection {
       this.connection.send(Endpoints.RequestTransactions, req);
     });
   }
-}
 
-export function useTransactionConnection() {
-  return useConnection(TransactionConnection, "/hubTransaction");
+  editTransaction(newTransaction: Transaction) {
+    console.log("editing transaction", this.id);
+    this.connectedPromise.then(() => {
+      this.connection.send(Endpoints.UpdateTransaction, newTransaction);
+    });
+  }
 }

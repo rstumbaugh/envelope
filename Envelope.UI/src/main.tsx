@@ -10,6 +10,8 @@ import UserProvider from "./util/UserProvider.tsx";
 import Budget from "./pages/Budget.tsx";
 import Account from "./components/account/Account.tsx";
 import MonthlyBudget from "./components/budget/MonthlyBudget.tsx";
+import ConnectionContextProvider from "./util/ConnectionProvider.tsx";
+import StoreProvider from "./store/store.tsx";
 
 export interface LoaderData {
   budgetId: string;
@@ -52,9 +54,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <GoogleCredentialsProvider>
       <UserProvider>
-        <GoogleOAuthProvider clientId={config.googleClientId}>
-          <RouterProvider router={router} />
-        </GoogleOAuthProvider>
+        <ConnectionContextProvider>
+          <StoreProvider>
+            <GoogleOAuthProvider clientId={config.googleClientId}>
+              <RouterProvider router={router} />
+            </GoogleOAuthProvider>
+          </StoreProvider>
+        </ConnectionContextProvider>
       </UserProvider>
     </GoogleCredentialsProvider>
   </React.StrictMode>,

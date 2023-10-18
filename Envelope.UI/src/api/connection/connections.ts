@@ -1,7 +1,4 @@
-import { HubConnectionBuilder, HubConnection } from "@microsoft/signalR";
-import { useContext, useEffect, useState } from "react";
-import { apiBase } from "../api";
-import { CredentialContext } from "../../util/GoogleCredentialsProvider";
+import { HubConnection } from "@microsoft/signalR";
 import _ from "lodash";
 
 export interface PromiseHandlers<T> {
@@ -33,28 +30,4 @@ export abstract class Connection {
       })
       .catch((err) => console.error("error connecting", err));
   }
-}
-
-export function useConnection<TConnection extends Connection>(
-  connType: { new (c: HubConnection): TConnection },
-  endpoint: string,
-) {
-  const [credentials] = useContext(CredentialContext);
-  const [connection, setConnection] = useState<TConnection>();
-
-  useEffect(() => {
-    if (!credentials) return;
-    if (connection) return;
-
-    const c = new HubConnectionBuilder()
-      .withUrl(`${apiBase}${endpoint}`, {
-        accessTokenFactory: () => credentials,
-      })
-      .build();
-    const conn = new connType(c);
-    conn.start();
-    setConnection(conn);
-  }, [connection, credentials, connType, endpoint]);
-
-  return connection;
 }

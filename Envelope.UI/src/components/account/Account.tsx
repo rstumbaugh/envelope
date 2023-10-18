@@ -1,31 +1,25 @@
 import { Col, Row } from "antd";
 import { useLoaderData } from "react-router-dom";
-import EditableTable from "../../util/EditableTable";
 import { Content } from "antd/es/layout/layout";
 import { LoaderData } from "../../main";
-import { useTransactionConnection } from "../../api/connection/transactionConnection";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Transaction } from "../../types/budget";
 import TransactionTable from "./TransactionTable";
+import { useConnections } from "../../util/ConnectionProvider";
+import { StoreContext } from "../../store/store";
 
 export default function Account() {
   const { accountId } = useLoaderData() as LoaderData;
+  const { byAccountId } = useContext(StoreContext);
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  const connection = useTransactionConnection();
-  useEffect(() => {
-    if (!connection) return;
-    connection.registerCallback(() => setTransactions(connection.accountTransactions[accountId]));
-    connection.requestTransactions({ accountId });
-  }, [accountId, connection]);
+  console.log(byAccountId);
 
   return (
     <Content style={{ padding: 8 }}>
       <Row>
         <Col span={24}>
           {/* <EditableTable /> */}
-          <TransactionTable transactions={transactions} />
+          <TransactionTable transactions={byAccountId[accountId]} />
         </Col>
       </Row>
     </Content>

@@ -1,7 +1,7 @@
 import { HubConnection } from "@microsoft/signalR";
 import { Dictionary } from "lodash";
 import { Budget } from "../../types/budget";
-import { Connection, PromiseHandlers, useConnection } from "./connections";
+import { Connection, PromiseHandlers } from "./connections";
 
 const Messages = {
   OnBudget: "OnBudget",
@@ -11,7 +11,7 @@ const Endpoints = {
   RequestBudget: "RequestBudget",
 };
 
-class BudgetConnection extends Connection {
+export class BudgetConnection extends Connection {
   budgetPromises: Dictionary<PromiseHandlers<Budget>>;
 
   constructor(connection: HubConnection) {
@@ -48,8 +48,4 @@ class BudgetConnection extends Connection {
       return p;
     });
   }
-}
-
-export function useBudgetConnection() {
-  return useConnection(BudgetConnection, "/hubBudget");
 }
