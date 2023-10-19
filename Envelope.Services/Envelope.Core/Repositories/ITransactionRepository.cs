@@ -16,7 +16,9 @@ namespace Envelope.Core.Repositories
     public interface ITransactionRepository
     {
         Task<Core.Models.Transaction[]> GetAsync(TransactionSearchRequest searchRequest);
+        Task<Transaction> AddAsync(Transaction transaction);
         Task<Transaction> UpdateAsync(Transaction newTransaction);
+        Task DeleteAsync(Transaction transaction);
     }
 
     public class NullTransactionRepository : ITransactionRepository
@@ -78,6 +80,21 @@ namespace Envelope.Core.Repositories
             }
 
             throw new Exception($"Transaction not found: {newTransaction}");
+        }
+
+        public Task<Transaction> AddAsync(Transaction transaction)
+        {
+            _transactions.Add(transaction);
+            return Task.FromResult(transaction);
+        }
+
+        public Task DeleteAsync(Transaction transaction)
+        {
+            var i = _transactions.FindIndex(t => t.Id == transaction.Id);
+            if (i >= 0)
+                _transactions.RemoveAt(i);
+
+            return Task.FromResult(transaction);
         }
     }
 }

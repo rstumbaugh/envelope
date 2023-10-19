@@ -9,6 +9,7 @@ namespace Envelope.Budget.Service.Hubs
     public interface ITransactionHubClient
     {
         Task OnTransactions(Transaction[] transactions);
+        Task OnDeleted(Transaction t);
     }
 
     public class TransactionHub : Hub<ITransactionHubClient>
@@ -38,5 +39,17 @@ namespace Envelope.Budget.Service.Hubs
             await Clients.All.OnTransactions(new[] { updated });
         }
 
+        public async Task AddTransaction(Transaction newTransaction)
+        {
+            var t = await _transactionRepository.AddAsync(newTransaction);
+            await Clients.All.OnTransactions(new[] { t });
+        }
+
+        public async Task DeleteTransaction(Transaction t)
+        {
+            await _transactionRepository.DeleteAsync(t);
+            await Clients.All.OnDeleted(t);
+
+        }
     }
 }
