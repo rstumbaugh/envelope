@@ -117,9 +117,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
         {dataType === "date" && <DatePicker onSelect={save} onBlur={save} />}
       </Form.Item>
     ) : (
-      <div className="editable-cell-value-wrap" style={{ paddingRight: 24 }}>
-        {children}
-      </div>
+      <div className="editable-cell-value-wrap">{children}</div>
     );
   }
 
@@ -137,13 +135,12 @@ interface HasId {
 interface ExtraColTypes {
   editable?: boolean;
   dataIndex: string;
-  dataType: DataType;
+  dataType?: DataType;
   isNegative?: boolean;
 }
 interface Props<T extends HasId> {
   data: T[];
   onEdit(edited: T): void;
-  onDelete?(item: T): void;
   columns: (ColumnType<T> & ExtraColTypes)[];
 }
 export default function EditableTable<T extends HasId>(props: Props<T>) {
@@ -185,6 +182,10 @@ export default function EditableTable<T extends HasId>(props: Props<T>) {
       bordered
       dataSource={data}
       columns={columns}
+      virtual={true}
+      scroll={{ x: 1, y: "100vh" }}
+      pagination={false}
+      size="small"
     />
   );
 }
