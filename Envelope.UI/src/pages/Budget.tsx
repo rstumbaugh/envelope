@@ -1,30 +1,21 @@
 import { Outlet, useLoaderData } from "react-router-dom";
 import { Budget, defaultBudget } from "../types/budget";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import { Layout } from "antd";
 import Sider from "antd/es/layout/Sider";
 import _ from "lodash";
 import BudgetNav from "../components/budget/BudgetNav";
 import { Content } from "antd/es/layout/layout";
 import { LoaderData } from "../main";
-import { useConnections } from "../util/ConnectionProvider";
+import { StoreContext } from "../store/store";
 
 export const BudgetContext = createContext<Budget>(defaultBudget);
 
 export default function BudgetPage() {
-  const { budgetId: id } = useLoaderData() as LoaderData;
-  const [budget, setBudget] = useState<Budget>(defaultBudget);
+  const { budgetId } = useLoaderData() as LoaderData;
 
-  const { budgetConnection } = useConnections();
-
-  useEffect(() => {
-    budgetConnection
-      ?.getBudget(id)
-      .then((budget) => {
-        setBudget(budget);
-      })
-      .catch((err) => console.error("error getting budget", err));
-  }, [id, budgetConnection]);
+  const { budgets } = useContext(StoreContext);
+  const budget = budgets.find((b) => b.id === budgetId) || defaultBudget;
 
   return (
     <BudgetContext.Provider value={budget}>

@@ -73,6 +73,9 @@ const EditableCell: React.FC<EditableCellProps> = ({
       case "date":
         value = dayjs(record[dataIndex]);
         break;
+      case "number":
+        value = isNegative ? Math.abs(parseFloat(record[dataIndex])) : record[dataIndex];
+        break;
       default:
         value = record[dataIndex];
     }
@@ -140,6 +143,7 @@ interface ExtraColTypes {
 interface Props<T extends HasId> {
   data: T[];
   onEdit(edited: T): void;
+  onDelete?(item: T): void;
   columns: (ColumnType<T> & ExtraColTypes)[];
 }
 export default function EditableTable<T extends HasId>(props: Props<T>) {

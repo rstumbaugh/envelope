@@ -32,3 +32,14 @@ export interface Transaction {
   amount: number;
   isCleared: boolean;
 }
+
+export const getNewTransaction = (accountId: string): Transaction => ({
+  id: crypto.randomUUID(),
+  accountId,
+  timestamp: new Date(),
+  payee: "",
+  categoryId: "",
+  note: "",
+  amount: 0,
+  isCleared: true,
+});

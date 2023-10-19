@@ -1,51 +1,41 @@
 import { HubConnection } from "@microsoft/signalR";
-import { Dictionary } from "lodash";
 import { Budget } from "../../types/budget";
-import { Connection, PromiseHandlers } from "./connections";
+import { Connection } from "./connections";
 
 const Messages = {
-  OnBudget: "OnBudget",
+  OnBudgets: "OnBudgets",
 };
 
 const Endpoints = {
-  RequestBudget: "RequestBudget",
+  RequestBudgets: "RequestBudgets",
 };
 
+type BudgetsUpdatedHandler = (budgets: Budget[]) => void;
+
 export class BudgetConnection extends Connection {
-  budgetPromises: Dictionary<PromiseHandlers<Budget>>;
+  onUpdateCallbacks: BudgetsUpdatedHandler[];
 
   constructor(connection: HubConnection) {
     super(connection);
 
-    this.budgetPromises = {};
+    this.onUpdateCallbacks = [];
   }
 
   initHandlers(): void {
-    this.connection.on(Messages.OnBudget, (budget: Budget) => {
-      this.budgetPromises[budget.id].resolve(budget);
+    this.connection.on(Messages.OnBudgets, (budgets: Budget[]) => {
+      this.onUpdateCallbacks.forEach((c) => c(budgets));
     });
   }
 
   onStart(): void {}
 
-  getBudget(id: string) {
-    if (id in this.budgetPromises) return this.budgetPromises[id].promise;
+  registerCallback(c: BudgetsUpdatedHandler) {
+    this.onUpdateCallbacks.push(c);
+  }
 
-    return this.connectedPromise.then(() => {
-      let handlers: Pick<
-        PromiseHandlers<Budget>,
-        "resolve" | "reject"
-      > = {} as PromiseHandlers<Budget>;
-
-      const p = new Promise<Budget>((resolve, reject) => {
-        handlers = { resolve, reject };
-      });
-
-      this.budgetPromises[id] = { ...handlers, promise: p };
-
-      this.connection.send(Endpoints.RequestBudget, id);
-
-      return p;
+  requestBudgets() {
+    this.connectedPromise.then(() => {
+      this.connection.send(Endpoints.RequestBudgets);
     });
   }
 }

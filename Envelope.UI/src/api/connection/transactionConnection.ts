@@ -5,11 +5,14 @@ import { HubConnection } from "@microsoft/signalR";
 
 const Messages = {
   OnTransactions: "OnTransactions",
+  OnDeleted: "OnDeleted",
 };
 
 const Endpoints = {
   RequestTransactions: "RequestTransactions",
   UpdateTransaction: "UpdateTransaction",
+  AddTransaction: "AddTransaction",
+  DeleteTransaction: "DeleteTransaction",
 };
 
 interface TransactionRequest {
@@ -17,8 +20,10 @@ interface TransactionRequest {
 }
 
 type TransactionsUpdatedHandler = (transactions: Transaction[]) => void;
+type TransactionDeletedHandler = (transaction: Transaction) => void;
 
 export class TransactionConnection extends Connection {
+  onDeletedCallbacks: TransactionDeletedHandler[];
   onUpdateCallbacks: TransactionsUpdatedHandler[];
   id: number;
 
@@ -26,21 +31,29 @@ export class TransactionConnection extends Connection {
     super(connection);
 
     this.onUpdateCallbacks = [];
+    this.onDeletedCallbacks = [];
     this.id = random(10000);
   }
 
   initHandlers(): void {
-    console.log("handlers for", this.id);
     this.connection.on(Messages.OnTransactions, (transactions: Transaction[]) => {
       this.onUpdateCallbacks.forEach((c) => c(transactions));
+    });
+
+    this.connection.on(Messages.OnDeleted, (t: Transaction) => {
+      this.onDeletedCallbacks.forEach((c) => c(t));
     });
   }
 
   onStart(): void {}
 
-  registerCallback(c: TransactionsUpdatedHandler) {
+  registerUpdateCallback(c: TransactionsUpdatedHandler) {
     console.log("registering callback");
     this.onUpdateCallbacks.push(c);
+  }
+
+  registerDeleteCallback(c: TransactionDeletedHandler) {
+    this.onDeletedCallbacks.push(c);
   }
 
   requestTransactions(req: TransactionRequest) {
@@ -50,9 +63,20 @@ export class TransactionConnection extends Connection {
   }
 
   editTransaction(newTransaction: Transaction) {
-    console.log("editing transaction", this.id);
     this.connectedPromise.then(() => {
       this.connection.send(Endpoints.UpdateTransaction, newTransaction);
+    });
+  }
+
+  addTransaction(t: Transaction) {
+    this.connectedPromise.then(() => {
+      this.connection.send(Endpoints.AddTransaction, t);
+    });
+  }
+
+  deleteTransaction(t: Transaction) {
+    this.connectedPromise.then(() => {
+      this.connection.send(Endpoints.DeleteTransaction, t);
     });
   }
 }

@@ -9,7 +9,7 @@ namespace Envelope.Budget.Service.Hubs
     public interface IBudgetHubClient
     {
         Task OnAuthenticated(UserAuthResult result);
-        Task OnBudget(Core.Models.Budget budget);
+        Task OnBudgets(Core.Models.Budget[] budgets);
     }
 
     public class BudgetHub : Hub<IBudgetHubClient>
@@ -27,11 +27,10 @@ namespace Envelope.Budget.Service.Hubs
             _budgetRepository = budgetRepository;
         }
 
-        public async Task RequestBudget(string budgetId)
+        public async Task RequestBudgets()
         {
-            _logger.LogInformation("Getting budget {id}", budgetId);
-            var budget = await _budgetRepository.GetAsync(budgetId);
-            await Clients.Caller.OnBudget(budget);
+            var budgets = await _budgetRepository.GetAsync();
+            await Clients.Caller.OnBudgets(budgets);
         }
     }
 }
