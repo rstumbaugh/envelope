@@ -8,6 +8,7 @@ const Messages = {
 
 const Endpoints = {
   RequestBudgets: "RequestBudgets",
+  AddAccount: "AddAccount",
 };
 
 type BudgetsUpdatedHandler = (budgets: Budget[]) => void;

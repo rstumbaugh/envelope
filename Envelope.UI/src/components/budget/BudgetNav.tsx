@@ -1,11 +1,23 @@
 import { useContext } from "react";
 import { BudgetContext } from "../../pages/Budget";
-import { Menu } from "antd";
+import { Button, Menu, Space } from "antd";
 import { MenuItemType } from "antd/es/menu/hooks/useItems";
 import _ from "lodash";
 import { Link, useLoaderData } from "react-router-dom";
 import { LoaderData } from "../../main";
 import { Account } from "../../types/budget";
+import styled from "styled-components";
+
+const MenuWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: white;
+`;
+
+const ButtonWrap = styled.div`
+  margin-left: 8px;
+`;
 
 function getAccountItem(budgetId: string, account: Account): MenuItemType {
   const { id, name, balance } = account;
@@ -48,34 +60,40 @@ export default function BudgetNav() {
   );
 
   return (
-    <Menu
-      mode="inline"
-      defaultSelectedKeys={[selectedMenuItem]}
-      style={{ height: "100%" }}
-      items={[
-        {
-          label: <Link to={`/budget/${budgetId}`}>{budget.name}</Link>,
-          key: budget.id,
-        },
-        {
-          label: `Accounts (${_.sum(account.map((a) => a.balance))})`,
-          key: "accounts",
-          type: "group",
-          children: account.map((a) => getAccountItem(budgetId, a)),
-        },
-        {
-          label: `Loans (${_.sum(loan.map((a) => a.balance))})`,
-          key: "loans",
-          type: "group",
-          children: loan.map((a) => getAccountItem(budgetId, a)),
-        },
-        {
-          label: `Investment (${_.sum(tracking.map((a) => a.balance))})`,
-          key: "tracking",
-          type: "group",
-          children: tracking.map((a) => getAccountItem(budgetId, a)),
-        },
-      ]}
-    />
+    <MenuWrap>
+      <Menu
+        mode="inline"
+        defaultSelectedKeys={[selectedMenuItem]}
+        style={{ height: "100%" }}
+        items={[
+          {
+            label: <Link to={`/budget/${budgetId}`}>{budget.name}</Link>,
+            key: budget.id,
+          },
+          {
+            label: `Accounts (${_.sum(account.map((a) => a.balance))})`,
+            key: "accounts",
+            type: "group",
+            children: account.map((a) => getAccountItem(budgetId, a)),
+          },
+          {
+            label: `Loans (${_.sum(loan.map((a) => a.balance))})`,
+            key: "loans",
+            type: "group",
+            children: loan.map((a) => getAccountItem(budgetId, a)),
+          },
+          {
+            label: `Investment (${_.sum(tracking.map((a) => a.balance))})`,
+            key: "tracking",
+            type: "group",
+            children: tracking.map((a) => getAccountItem(budgetId, a)),
+          },
+        ]}
+      />
+
+      <ButtonWrap>
+        <Button>Add account</Button>
+      </ButtonWrap>
+    </MenuWrap>
   );
 }
