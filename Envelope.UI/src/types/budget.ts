@@ -1,7 +1,27 @@
+import { Dictionary } from "lodash";
+
 export interface Budget {
   id: string;
   name: string;
   accounts: Account[];
+  categories: Category[];
+  categoryGroups: CategoryGroup[];
+  monthlyAssigned: Dictionary<MonthlyAssignments>;
+}
+
+export interface CategoryGroup {
+  id: string;
+  name: string;
+}
+
+export interface Category {
+  id: string;
+  groupId: string;
+  name: string;
+}
+
+export interface MonthlyAssignments {
+  categoryAssigned: Dictionary<number>;
 }
 
 export type AccountType = "CashAccount" | "CreditCard" | "Loan" | "Tracking";
@@ -16,10 +36,23 @@ export interface Account {
   isOpen: boolean;
 }
 
+export const defaultAccount: Account = {
+  id: "",
+  name: "",
+  balance: 0,
+  clearedBalance: 0,
+  unclearedBalance: 0,
+  type: "CashAccount",
+  isOpen: true,
+};
+
 export const defaultBudget: Budget = {
   id: "",
   name: "",
   accounts: [],
+  categories: [],
+  categoryGroups: [],
+  monthlyAssigned: {},
 };
 
 export interface Transaction {

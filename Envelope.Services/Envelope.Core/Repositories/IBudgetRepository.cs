@@ -52,6 +52,65 @@ namespace Envelope.Core.Repositories
                        Type = AccountType.Loan,
                        ClearedBalance = -5000
                    }
+                },
+                CategoryGroups = new []
+                {
+                    new CategoryGroup
+                    {
+                        Id = "fixed",
+                        Name = "Fixed"
+                    },
+                    new CategoryGroup
+                    {
+                        Id = "variable",
+                        Name = "Variable"
+                    }
+                },
+                Categories = new []
+                {
+                    new Category
+                    {
+                        Id = "category1",
+                        Name = "Rent",
+                        GroupId = "fixed"
+                    },
+                    new Category
+                    {
+                        Id = "category2",
+                        Name = "Utilities",
+                        GroupId = "fixed"
+                    },
+                    new Category
+                    {
+                        Id = "category1",
+                        Name = "Food",
+                        GroupId = "variable"
+                    },
+                    new Category
+                    {
+                        Id = "category4",
+                        Name = "Drinks",
+                        GroupId = "variable"
+                    },
+                    new Category
+                    {
+                        Id = "category5",
+                        Name = "Shopping",
+                        GroupId = "variable"
+                    },
+                },
+                MonthlyAssigned = new Dictionary<string, MonthlyAssigned>
+                {
+                    ["202310"] = new MonthlyAssigned
+                    {
+                        CategoryAssigned = new Dictionary<string, double>
+                        {
+                            ["category1"] = 100,
+                            ["category2"] = 534,
+                            ["category3"] = 342.12,
+                            ["category4"] = 890.56,
+                        }
+                    }
                 }
             }
         };

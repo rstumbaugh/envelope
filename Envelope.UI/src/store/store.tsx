@@ -1,4 +1,4 @@
-import _, { Dictionary, groupBy } from "lodash";
+import _, { Dictionary } from "lodash";
 import { Budget, Transaction } from "../types/budget";
 import { createContext, useEffect, useReducer } from "react";
 import { useConnections } from "../util/ConnectionProvider";
