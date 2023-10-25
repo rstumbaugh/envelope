@@ -1,12 +1,13 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { BudgetContext } from "../../pages/Budget";
 import { Button, Menu, Space } from "antd";
 import { MenuItemType } from "antd/es/menu/hooks/useItems";
 import _ from "lodash";
 import { Link, useLoaderData } from "react-router-dom";
 import { LoaderData } from "../../main";
-import { Account } from "../../types/budget";
+import { Account, defaultAccount } from "../../types/budget";
 import styled from "styled-components";
+import AddAccountModal from "./AddAccountModal";
 
 const MenuWrap = styled.div`
   display: flex;
@@ -36,6 +37,7 @@ export default function BudgetNav() {
   const { budgetId, accountId } = useLoaderData() as LoaderData;
 
   const budget = useContext(BudgetContext);
+  const [accountModalOpen, setAccountModalOpen] = useState<boolean>(false);
 
   const selectedMenuItem = accountId || budgetId;
 
@@ -93,6 +95,11 @@ export default function BudgetNav() {
 
       <ButtonWrap>
         <Button>Add account</Button>
+        <AddAccountModal
+          open={accountModalOpen}
+          onAdd={(a) => setAccountModalOpen(false)}
+          onClose={() => setAccountModalOpen(false)}
+        />
       </ButtonWrap>
     </MenuWrap>
   );
